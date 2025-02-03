@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="sidebar">
+        <button onclick="window.location.href='/panel'">Panel</button>
+        <button onclick="window.location.href='/stats'">Statystyki</button>
+        <button onclick="window.location.href='/uzytkownicy'">Użytkownicy</button>
+        <button onclick="window.location.href='/wpisy'">Wpisy</button>    
+    </div>
+    <div class="content">
+        <header>
+            <div class="header-container">
+                <div class="g">
+                    <h1>Webpoligon stats app</h1>
+                </div>
+                <div class="container">
+                    <button onclick="window.location.href='/wylogowanie'">Wyloguj</button>
+                </div>
+            </div>
+        </header>
+        <section>     
+            <div class="odwiedziny">
+                <h1>Odwiedziny: {{ views }}</h1>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

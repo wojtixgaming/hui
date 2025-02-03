@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statystyki</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <button onclick="window.location.href='/panel'">Panel</button>
+        <button onclick="window.location.href='/stats'">Statystyki</button>
+        <button onclick="window.location.href='/uzytkownicy'">Użytkownicy</button>
+        <button onclick="window.location.href='/wpisy'">Wpisy</button>
+        
+    </div>
+    <div class="content">
+        <header>
+            <div class="header-container">
+                <div class="g"><h1>Webpoligon stats app</h1></div>
+                <div class="container">
+                    <button onclick="window.location.href='/wylogowanie'">Wyloguj</button>
+                </div>
+            </div>
+        </header>
+        <h2>Statystyki</h2>
+        <div class="chart-controls">
+            <label for="timeframe">Wybierz okres:</label>
+            <select id="timeframe" onchange="updateChart()">
+                <option value="day">Dzień</option>
+                <option value="week">Tydzień</option>
+                <option value="month">Miesiąc</option>
+                <option value="year">Rok</option>
+            </select>
+        </div>
+        <canvas id="trafficChart"></canvas>
+        <script>
+            let chart;
+            
+            function updateChart() {
+                const timeframe = document.getElementById('timeframe').value;
+                fetch(`/get_traffic_data?timeframe=${timeframe}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (chart) {
+                            chart.destroy(); // Zniszczenie starego wykresu, by utworzyć nowy
+                        }
+                        
+                        const ctx = document.getElementById('trafficChart').getContext('2d');
+                        chart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: data.labels,
+                                datasets: [{
+                                    label: 'Liczba wejść',
+                                    data: data.views,
+                                    borderColor: 'rgba(75, 192, 192, 1)',
+                                    borderWidth: 2
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                    });
+            }
+
+            document.addEventListener('DOMContentLoaded', updateChart);
+        </script>
+    </div>
+</body>
+</html>

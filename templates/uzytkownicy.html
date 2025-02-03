@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Użytkownicy</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <button onclick="window.location.href='/panel'">Panel</button>
+        <button onclick="window.location.href='/stats'">Statystyki</button>
+        <button onclick="window.location.href='/uzytkownicy'">Użytkownicy</button>
+        <button onclick="window.location.href='/wpisy'">Wpisy</button>
+        
+    </div>
+    <div class="content">
+        <header>
+            <div class="header-container">
+                <div class="g"><h1>Webpoligon stats app</h1></div>
+                <div class="container">
+                  
+                    <button onclick="window.location.href='/wylogowanie'">Wyloguj</button>
+                </div>
+            </div>
+        </header>
+        <h2>Użytkownicy</h2>
+        <button onclick="document.getElementById('addUserModal').style.display='block'">Dodaj użytkownika</button>
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>Nazwa użytkownika</th>
+                <th>E-mail</th>
+                <th>Imię</th>
+                <th>Nazwisko</th>
+                <th>Numer telefonu</th>
+                <th>Rola</th>
+                <th>Akcje</th>
+            </tr>
+            {% for user in users %}
+            <tr>
+                <td>{{ user[0] }}</td>
+                <td>{{ user[1] }}</td>
+                <td>{{ user[2] }}</td>
+                <td>{{ user[3] }}</td>
+                <td>{{ user[4] }}</td>
+                <td>{{ user[5] }}</td>
+                <td>{{ user[6] }}</td>
+                <td>
+                    <button onclick="openEditModal('{{ user[0] }}', '{{ user[1] }}', '{{ user[2] }}', '{{ user[3] }}', '{{ user[4] }}', '{{ user[5] }}', '{{ user[6] }}')">Edytuj</button>
+                    <form action="/uzytkownicy" method="post" style="display:inline;">
+                        <input type="hidden" name="action" value="delete">
+                        <input type="hidden" name="user_id" value="{{ user[0] }}">
+                        <button type="submit">Usuń</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <!-- Modal do dodawania użytkownika -->
+    <div id="addUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="document.getElementById('addUserModal').style.display='none'">&times;</span>
+            <h2>Dodaj użytkownika</h2>
+            <form action="/uzytkownicy" method="post">
+                <input type="hidden" name="action" value="add">
+                <input type="text" name="username" placeholder="Nazwa użytkownika" required>
+                <input type="password" name="password" placeholder="Hasło" required>
+                <input type="email" name="email" placeholder="E-mail">
+                <input type="text" name="first_name" placeholder="Imię">
+                <input type="text" name="last_name" placeholder="Nazwisko">
+                <input type="text" name="phone_number" placeholder="Numer telefonu">
+                <select name="role" required>
+                    <option value="admin">Admin</option>
+                    <option value="user">Użytkownik</option>
+                    <option value="guest">Gość</option>
+                </select>
+                <button type="submit">Dodaj użytkownika</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal do edytowania użytkownika -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="document.getElementById('editUserModal').style.display='none'">&times;</span>
+            <h2>Edytuj użytkownika</h2>
+            <form id="editUserForm" action="/uzytkownicy" method="post">
+                <input type="hidden" name="action" value="edit">
+                <input type="hidden" name="user_id" id="editUserId">
+                <input type="text" name="username" id="editUsername">
+                <input type="password" name="password" placeholder="Nowe hasło">
+                <input type="text" name="email" id="editEmail">
+                <input type="text" name="first_name" id="editFirstName">
+                <input type="text" name="last_name" id="editLastName">
+                <input type="text" name="phone_number" id="editPhoneNumber">
+                <select name="role" id="editRole">
+                    <option value="admin">Admin</option>
+                    <option value="user">Użytkownik</option>
+                    <option value="guest">Gość</option>
+                </select>
+                <button type="submit">Edytuj użytkownika</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openEditModal(userId, username, email, firstName, lastName, phoneNumber, role) {
+            document.getElementById('editUserId').value = userId;
+            document.getElementById('editUsername').value = username;
+            document.getElementById('editEmail').value = email;
+            document.getElementById('editFirstName').value = firstName;
+            document.getElementById('editLastName').value = lastName;
+            document.getElementById('editPhoneNumber').value = phoneNumber;
+            document.getElementById('editRole').value = role;
+            document.getElementById('editUserModal').style.display = 'block';
+        }
+
+        // Zamknij modal, gdy użytkownik kliknie poza nim
+        window.onclick = function(event) {
+            var addModal = document.getElementById('addUserModal');
+            var editModal = document.getElementById('editUserModal');
+            if (event.target == addModal) {
+                addModal.style.display = "none";
+            }
+            if (event.target == editModal) {
+                editModal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

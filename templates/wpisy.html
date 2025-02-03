@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wpisy</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="sidebar">
+        <button onclick="window.location.href='/panel'">Panel</button>
+        <button onclick="window.location.href='/stats'">Statystyki</button>
+        <button onclick="window.location.href='/uzytkownicy'">Użytkownicy</button>
+        <button onclick="window.location.href='/wpisy'">Wpisy</button>
+    </div>
+    <div class="content">
+        <header>
+            <div class="header-container">
+                <div class="g"><h1>Webpoligon</h1></div>
+                <div class="container">
+                    <button onclick="window.location.href='/wylogowanie'">Wyloguj</button>
+                </div>
+            </div>
+        </header>
+
+        <section>
+            <h2>Dodaj wpis</h2>
+            <form action="/add-entry" method="post">
+                <div>
+                    <label for="title">Tytuł:</label>
+                    <input type="text" name="title" id="title" required>
+                </div>
+                <div>
+                    <label for="entry">Wpis:</label>
+                    <input type="text" id="entry" name="entry" required>
+                </div>
+                <div>
+                    <button type="submit">Potwierdź</button>
+                </div>
+            </form>
+            <h2>Wpisy</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tytuł</th>
+                        <th>Wpis</th>
+                        <th>Data</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for post in posts %}
+                    <tr>
+                        <td>{{ post[1] }}</td>  <!-- Tytuł wpisu -->
+                        <td>{{ post[2] }}</td>  <!-- Treść wpisu -->
+                        <td>{{ post[3] }}</td>  <!-- Data -->
+                        <td>
+                            <form action="{{ url_for('usun_wpis', post_id=post[0]) }}" method="post">
+                                <button type="submit">Usuń</button>
+                            </form>   
+                            <button onclick="window.location.href='/wpis/{{ post[1] }}'">otwórz</button>                         
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                
+            </table>
+        </section>
+    </div>
+</body>
+</html>
